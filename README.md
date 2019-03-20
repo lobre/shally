@@ -14,15 +14,15 @@ Effectivery, the footprint of sshrc on the processes is quite heavy so I wanted 
 
 That is why I came up with this new shally script that would answer these problematics.
 
-It rely on the ControlMaster feature of the OpenSSH client to reuse a same connection for the following tasks:
+It relies on the ControlMaster feature of the OpenSSH client to reuse a same connection for the following tasks:
 
 - Initiate a master connection and store the socket file.
-- Send dotfiles in the `/tmp/` folder using `scp` and the same connection as before.
+- Send dotfiles in the `/tmp/` folder using `scp` or `rsync` (if available) using the same connection as before.
 - Call the actual `ssh` process using again the same connection.
 - Connect a last time before exit to delete all traces.
 - Close the master connection.
 
-Using the same connection transparently allow to speed up the process so it feels like only the actual `ssh` call is made. Then the speed with depend on the heavyness of your dotfiles but it should allow to transmit bigger than 64kB.
+Using the same connection allows to speed up the process so it feels only the actual `ssh` call is made. Then the speed with depend on the heavyness of your dotfiles but it should allow to transmit bigger than 64kB.
 
 The biggest the files you transfer, the longest you will have to wait to get the ssh prompt as shally needs to send your files remotely before.
 
@@ -36,7 +36,7 @@ Just download the shally script, make it executable and put it in your path.
 
 ## Configuration
 
-shally uploads the two following path on the remote machine:
+shally uploads the two following paths on the remote machine:
 - $HOME/.sshrc
 - $HOME/.sshrc.d/
 
@@ -48,3 +48,5 @@ So for instance, if you want to have your bashrc sourced on the remote, copy it 
 $ cat $HOME/.sshrc
 source $SSHHOME/.sshrc.d/bashrc;
 ```
+
+This works pretty much the same way as sshrc. Don't hesitate to check [sshrc](https://github.com/Russell91/sshrc)'s README for more information.

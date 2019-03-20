@@ -46,7 +46,7 @@ ssh -o ControlPath="$SOCKET" "$DOMAIN" "mkdir -p $SSHHOME"
 # Define transfer command
 COPY_CMD="scp -o ControlPath=$SOCKET -r"
 
-# Use rsync over scp if exists)
+# Use rsync over scp if exists
 if command -v rsync > /dev/null; then
     COPY_CMD="rsync -avz -L -e \"ssh -o ControlPath=$SOCKET\""
 fi

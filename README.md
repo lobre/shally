@@ -34,6 +34,14 @@ In the `ps` table, the command is much more discreet.
 
 Just download the shally script, make it executable and put it in your path.
 
+If you want shally as default instead of ssh, alias it in your `$HOME/.bashrc`.
+
+    # Don't alias if currently in remote ssh session
+    # This allows to use this same bashrc sent remotely by shally
+    if command -v shally >/dev/null && [ -z "$SSHHOME" ]; then
+        alias ssh="shally"
+    fi
+
 ## Configuration
 
 shally uploads the two following paths on the remote machine:

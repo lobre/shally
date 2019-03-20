@@ -37,8 +37,8 @@ Just download the shally script, make it executable and put it in your path.
 ## Configuration
 
 shally uploads the two following paths on the remote machine:
-- $HOME/.sshrc
-- $HOME/.sshrc.d/
+- `$HOME/.sshrc` under `$SSHHOME/sshrc`
+- `$HOME/.sshrc.d/` under `$SSHHOME/sshrc.d/`
 
 Then it sources the `$HOME/.sshrc`
 
@@ -46,7 +46,7 @@ So for instance, if you want to have your bashrc sourced on the remote, copy it 
 
 ```
 $ cat $HOME/.sshrc
-source $SSHHOME/.sshrc.d/bashrc;
+source $SSHHOME/sshrc.d/bashrc;
 ```
 
 This works pretty much the same way as sshrc. Don't hesitate to check [sshrc](https://github.com/Russell91/sshrc)'s README for more information.

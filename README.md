@@ -58,3 +58,5 @@ source $SSHHOME/sshrc.d/bashrc;
 ```
 
 This works pretty much the same way as sshrc. Don't hesitate to check [sshrc](https://github.com/Russell91/sshrc)'s README for more information.
+
+You can also throw an eye to my [dotfiles](https://github.com/lobre/dotfiles) as I have examples using shally.

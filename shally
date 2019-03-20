@@ -33,7 +33,7 @@ if [ ! -d "$HOME/.ssh/sockets" ]; then
 fi
 
 # Generate unique id for socket name
-UNIQUE_ID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+UNIQUE_ID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
 
 # Initiate master connection
 SOCKET="$HOME/.ssh/sockets/shally-$UNIQUE_ID.sock"

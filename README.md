@@ -1,4 +1,4 @@
-# shally
+# shally (ssh-ally)
 
 > Send dotfiles with you over SSH
 
@@ -24,4 +24,27 @@ It rely on the ControlMaster feature of the OpenSSH client to reuse a same conne
 
 Using the same connection transparently allow to speed up the process so it feels like only the actual `ssh` call is made. Then the speed with depend on the heavyness of your dotfiles but it should allow to transmit bigger than 64kB.
 
+The biggest the files you transfer, the longest you will have to wait to get the ssh prompt as shally needs to send your files remotely before.
+
 In the `ps` table, the command is much more discreet.
+
+![ps-shally](https://raw.githubusercontent.com/lobre/shally/master/ps-shally.png)
+
+## Installation
+
+Just download the shally script, make it executable and put it in your path.
+
+## Configuration
+
+shally uploads the two following path on the remote machine:
+- $HOME/.sshrc
+- $HOME/.sshrc.d/
+
+Then it sources the `$HOME/.sshrc`
+
+So for instance, if you want to have your bashrc sourced on the remote, copy it under `$HOME/.sshrc.d/bashrc` locally and then use this your `$HOME/.sshrc` file.
+
+```
+$ cat $HOME/.sshrc
+source $SSHHOME/.sshrc.d/bashrc;
+```

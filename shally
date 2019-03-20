@@ -1,28 +1,71 @@
 #!/bin/bash
 
-# Get the target remote information
-REMOTE=$@
+# Function to parse domain and arguments
+function parse_args() {
+    while [[ -n $1 ]]; do
+        case $1 in
+            -b | -c | -D | -E | -e | -F | -I | -i | -L | -l | -m | -O | -o | -p | -Q | -R | -S | -W | -w)
+                ARGS="$ARGS $1 $2"
+                shift
+                ;;
+            -*)
+                ARGS="$ARGS $1"
+                ;;
+            *)
+                if [ -z "$DOMAIN" ]; then
+                    DOMAIN="$1"
+                fi
+                ;;
+        esac
+        shift
+    done
+    if [ -z "$DOMAIN" ]; then
+        ssh "$ARGS"; exit 1;
+    fi
+}
+
+# Parse arguments
+parse_args "$@"
 
 # Check sockets folder exists
-if [ ! -d $HOME/.ssh/sockets ]; then
-    mkdir -p $HOME/.ssh/sockets
+if [ ! -d "$HOME/.ssh/sockets" ]; then
+    mkdir -p "$HOME/.ssh/sockets"
 fi
 
 # Generate unique id for socket name
 UNIQUE_ID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
 # Initiate master connection
-SSHSOCKET=$HOME/.ssh/sockets/shally-$UNIQUE_ID.sock
-ssh -M -f -N -o ControlPath=$SSHSOCKET $REMOTE
+SOCKET="$HOME/.ssh/sockets/shally-$UNIQUE_ID.sock"
+ssh -M -f -N -o ControlPath="$SOCKET" "$DOMAIN"
 
-# Pre command hook
-ssh -o ControlPath=$SSHSOCKET $REMOTE "touch /tmp/$UNIQUE_ID.txt"
+# Create SSHHOME in /tmp/
+SSHHOME="/tmp/shally-$UNIQUE_ID"
+ssh -o ControlPath="$SOCKET" "$DOMAIN" "mkdir -p $SSHHOME"
+
+# Define transfer command
+COPY_CMD="scp -o ControlPath=$SOCKET -r"
+
+# Use rsync over scp if exists)
+if command -v rsync > /dev/null; then
+    COPY_CMD="rsync -avz -L -e \"ssh -o ControlPath=$SOCKET\""
+fi
+
+# Upload sshrc
+if [ -f "$HOME/.sshrc" ]; then
+    eval "$COPY_CMD" "$HOME/.sshrc" "$DOMAIN:$SSHHOME/sshrc" > /dev/null
+fi
+
+# Upload sshrc.d
+if [ -d "$HOME/.sshrc.d" ]; then
+    eval "$COPY_CMD" "$HOME/.sshrc.d/" "$DOMAIN:$SSHHOME/sshrc.d/" > /dev/null
+fi
 
 # Call the actual command
-ssh -o ControlPath=$SSHSOCKET $REMOTE
+ssh -o ControlPath="$SOCKET" -t "$DOMAIN" "$ARGS" "export SSHHOME=$SSHHOME; bash --rcfile \$SSHHOME/sshrc"
 
-# Post command hook
-ssh -o ControlPath=$SSHSOCKET $REMOTE "rm -f /tmp/$UNIQUE_ID.txt"
+# Clean dotfiles
+ssh -o ControlPath="$SOCKET" "$DOMAIN" "rm -rf $SSHHOME"
 
 # Close the master connection
-ssh -S $SSHSOCKET -O exit $REMOTE
+ssh -S "$SOCKET" -O exit "$DOMAIN" 2> /dev/null

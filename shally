@@ -67,7 +67,7 @@ fi
 
 # If custom command add it to sshrc script to execute it when connected
 if [ ! -z "$CMDARG" ]; then
-    ssh -o ControlPath="$SOCKET" "$DOMAIN" "echo \"$CMDARG\" >> $SSHHOME/sshrc"
+    ssh -o ControlPath="$SOCKET" "$DOMAIN" "echo -e \"\n# Custom entrypoint\n$CMDARG\" >> $SSHHOME/sshrc"
 fi
 
 # Call the actual command

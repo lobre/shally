@@ -16,7 +16,7 @@ function parse_args() {
                     DOMAIN="$1"
                 else
                     local SEMICOLON=$([[ "$@" = *[![:space:]]* ]] && echo '; ')
-                    CMDARG="$@$SEMICOLON exit"
+                    ENTRYPOINT="$@$SEMICOLON exit"
                     return;
                 fi
                 ;;
@@ -66,8 +66,8 @@ if [ -d "$HOME/.sshrc.d" ]; then
 fi
 
 # If custom command add it to sshrc script to execute it when connected
-if [ ! -z "$CMDARG" ]; then
-    ssh -o ControlPath="$SOCKET" "$DOMAIN" "echo -e \"\n# Custom entrypoint\n$CMDARG\" >> $SSHHOME/sshrc"
+if [ ! -z "$ENTRYPOINT" ]; then
+    ssh -o ControlPath="$SOCKET" "$DOMAIN" "echo -e \"\n# Custom entrypoint\n$ENTRYPOINT\" >> $SSHHOME/sshrc"
 fi
 
 # Call the actual command

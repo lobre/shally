@@ -43,6 +43,12 @@ UNIQUE_ID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
 SOCKET="$HOME/.ssh/sockets/shally-$UNIQUE_ID.sock"
 ssh -M -f -N -o ControlPath="$SOCKET" "$DOMAIN"
 
+# Exit if error on first ssh connection
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+
 # Create SSHHOME in /tmp/
 SSHHOME="/tmp/shally-$UNIQUE_ID"
 ssh -o ControlPath="$SOCKET" "$DOMAIN" "mkdir -p $SSHHOME"

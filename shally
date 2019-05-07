@@ -24,7 +24,7 @@ function parse_args() {
         shift
     done
     if [ -z "$DOMAIN" ]; then
-        ssh "$ARGS"; exit 1;
+        ssh $ARGS; exit 1;
     fi
 }
 
@@ -41,7 +41,7 @@ UNIQUE_ID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
 
 # Initiate master connection
 SOCKET="$HOME/.ssh/sockets/shally-$UNIQUE_ID.sock"
-ssh -M -f -N -o ControlPath="$SOCKET" "$DOMAIN"
+ssh -M -f -N -o ControlPath=$SOCKET $DOMAIN
 
 # Exit if error on first ssh connection
 if [ $? -ne 0 ]
@@ -51,7 +51,7 @@ fi
 
 # Create SSHHOME in /tmp/
 SSHHOME="/tmp/shally-$UNIQUE_ID"
-ssh -o ControlPath="$SOCKET" "$DOMAIN" "mkdir -p $SSHHOME"
+ssh -o ControlPath=$SOCKET $DOMAIN "mkdir -p $SSHHOME"
 
 # Define transfer command
 COPY_CMD="scp -o ControlPath=$SOCKET -r"
@@ -73,14 +73,14 @@ fi
 
 # If custom command add it to sshrc script to execute it when connected
 if [ ! -z "$ENTRYPOINT" ]; then
-    ssh -o ControlPath="$SOCKET" "$DOMAIN" "echo -e \"\n# Custom entrypoint\n$ENTRYPOINT\" >> $SSHHOME/sshrc"
+    ssh -o ControlPath=$SOCKET $DOMAIN "echo -e \"\n# Custom entrypoint\n$ENTRYPOINT\" >> $SSHHOME/sshrc"
 fi
 
 # Call the actual command
-ssh -o ControlPath="$SOCKET" -t "$DOMAIN" "$ARGS" "export SSHHOME=$SSHHOME; bash --rcfile \$SSHHOME/sshrc"
+ssh -o ControlPath=$SOCKET -t $DOMAIN $ARGS "export SSHHOME=$SSHHOME; bash --rcfile \$SSHHOME/sshrc"
 
 # Clean dotfiles
-ssh -o ControlPath="$SOCKET" "$DOMAIN" "rm -rf $SSHHOME"
+ssh -o ControlPath=$SOCKET $DOMAIN "rm -rf $SSHHOME"
 
 # Close the master connection
-ssh -S "$SOCKET" -O exit "$DOMAIN" 2> /dev/null
+ssh -S $SOCKET -O exit $DOMAIN 2> /dev/null

@@ -78,9 +78,12 @@ fi
 
 # Call the actual command
 ssh -o ControlPath=$SOCKET -t $DOMAIN $ARGS "export SSHHOME=$SSHHOME; bash --rcfile \$SSHHOME/sshrc"
+status=$?
 
 # Clean dotfiles
 ssh -o ControlPath=$SOCKET $DOMAIN "rm -rf $SSHHOME"
 
 # Close the master connection
 ssh -S $SOCKET -O exit $DOMAIN 2> /dev/null
+
+exit $status
